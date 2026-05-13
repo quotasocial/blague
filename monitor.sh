@@ -41,17 +41,25 @@ cat << "EOF"
  | |  | | | | | | \__ \ | |_| | |  __/ | (_| |  __/ | | | |___| (_| | |_| | (_| (_| | |_| | (_) | | | | | |\  | (_| | |_| | (_) | | | | (_| | |  __/
  |_|  |_|_|_| |_|_|___/_|\__|_|  \___|  \__,_|\___| |_| |______\__,_|\__,_|\___\__,_|\__|_|\___/|_| |_| |_| \_|\__,_|\__|_|\___/|_| |_|\__,_|_|\___|
                                                                                                                                                     
-                                                                                                                                                    
+                                                                                                                                                       
+
 EOF
 }
 
 header() {
   clear
+
   echo -e "${BLUE}"
-  marianne
+  marianne | sed -n '1,4p'
+
+  echo -e "${WHITE}"
+  marianne | sed -n '5,8p'
+
+  echo -e "${RED}"
+  marianne | sed -n '9,999p'
+
   echo -e "${RESET}"
-  echo -e "${BLUE}${BOLD}██${WHITE} BY LYAM ${RED}██${RESET}"
-  echo -e "${DIM}Faite gaffe à pas faire nimp${RESET}"
+
   echo
 }
 
@@ -59,26 +67,44 @@ dashboard() {
   header
 
   echo -e "${CYAN}[ SESSION ]${RESET}"
-  echo -e " NODE-ID        : ${GREEN}SIM-EDU-$((1000 + RANDOM % 8999))${RESET}"
-  echo -e " MODE           : ${YELLOW}LOCAL DEMO${RESET}"
+  echo -e " NODE-ID        : ${GREEN}EDU-NODE-$((1000 + RANDOM % 8999))${RESET}"
+  echo -e " PROFILE        : ${YELLOW}LOCAL TERMINAL${RESET}"
   echo -e " OPERATOR       : ${WHITE}$USER${RESET}"
-  echo -e " HOST           : ${WHITE}$(hostname)${RESET}"
   echo -e " TIMESTAMP      : ${WHITE}$(date '+%Y-%m-%d %H:%M:%S')${RESET}"
   echo
 
   echo -e "${CYAN}[ CLASSES JSON ]${RESET}"
-  jq -r '.classes[] | " \(.id) | \(.name) | élèves=\(.students) | état=\(.status)"' data/classes.json
-  echo
+  jq -r '.classes[] |
+  " \(.id) | \(.name) | élèves=\(.students) | état=\(.status)"' \
+  data/classes.json
 
+  echo
   echo -e "${CYAN}[ ÉVÉNEMENTS LIVE ]${RESET}"
+
   for i in {1..12}; do
     case $((RANDOM % 5)) in
-      0) tag="${GREEN}[OK]${RESET}"; msg="cache pédagogique synchronisé";;
-      1) tag="${YELLOW}[WARN]${RESET}"; msg="latence  sur relais local";;
-      2) tag="${CYAN}[INFO]${RESET}"; msg="lecture index classes.json";;
-      3) tag="${BLUE}[SYNC]${RESET}"; msg="paquet local $(rand_ip)";;
-      4) tag="${RED}[DENY]${RESET}"; msg="requête externe bloquée par mode demo";;
+      0)
+        tag="${GREEN}[OK]${RESET}"
+        msg="cache pédagogique synchronisé"
+      ;;
+      1)
+        tag="${YELLOW}[WARN]${RESET}"
+        msg="latence sur relais régional"
+      ;;
+      2)
+        tag="${CYAN}[INFO]${RESET}"
+        msg="lecture index classes.json"
+      ;;
+      3)
+        tag="${BLUE}[SYNC]${RESET}"
+        msg="paquet local $(rand_ip)"
+      ;;
+      4)
+        tag="${RED}[DENY]${RESET}"
+        msg="requête externe bloquée par politique locale"
+      ;;
     esac
+
     echo -e " $(date '+%H:%M:%S') $tag $msg"
   done
 
@@ -89,23 +115,49 @@ dashboard() {
 
 show_json() {
   header
+
   echo -e "${CYAN}[ classes.json ]${RESET}"
-  jq . data/classes.json
+  jq . classes.json
+
   echo
   echo -e "${CYAN}[ events.json ]${RESET}"
-  jq . data/events.json
+  jq . events.json
+
   echo
   read -n 1 -s -r -p "Appuie sur une touche pour revenir..."
 }
 
 live_logs() {
   header
-  echo -e "${CYAN}[ Entrer dans la DB ]${RESET}"
+
+  echo -e "${CYAN}[ LIVE STREAM ]${RESET}"
   echo
 
   while true; do
-    echo -e "$(date '+%H:%M:%S') ${GREEN}[OK]${RESET} heartbeat local :: node=SIM-$((RANDOM%99)) :: ip=$(rand_ip)"
+
+    case $((RANDOM % 4)) in
+      0)
+        tag="${GREEN}[OK]${RESET}"
+        msg="heartbeat node=EDU-$((RANDOM%99))"
+      ;;
+      1)
+        tag="${BLUE}[SYNC]${RESET}"
+        msg="replication packet :: $(rand_ip)"
+      ;;
+      2)
+        tag="${YELLOW}[WARN]${RESET}"
+        msg="latence détectée sur relais"
+      ;;
+      3)
+        tag="${CYAN}[INFO]${RESET}"
+        msg="lecture cache académique"
+      ;;
+    esac
+
+    echo -e "$(date '+%H:%M:%S') $tag $msg"
+
     sleep 0.15
+
     if read -t 0.01 -n 1 key && [[ "$key" == "q" ]]; then
       break
     fi
@@ -113,13 +165,25 @@ live_logs() {
 }
 
 while true; do
+
   dashboard
+
   read -n 1 -s key
 
   case "$key" in
-    r) ;;
-    j) show_json ;;
-    l) live_logs ;;
-    q) tput cnorm; clear; exit ;;
+    r)
+      ;;
+    j)
+      show_json
+      ;;
+    l)
+      live_logs
+      ;;
+    q)
+      tput cnorm
+      clear
+      exit
+      ;;
   esac
+
 done
