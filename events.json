@@ -1,0 +1,20 @@
+{
+  "events": [
+    {
+      "level": "INFO",
+      "message": "Simulation locale initialisée"
+    },
+    {
+      "level": "SYNC",
+      "message": "Classes fictives chargées depuis JSON"
+    },
+    {
+      "level": "WARN",
+      "message": "Connexion externe désactivée"
+    },
+    {
+      "level": "OK",
+      "message": "Interface plein écran active"
+    }
+  ]
+}
