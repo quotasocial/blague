@@ -74,7 +74,7 @@ dashboard() {
   for i in {1..12}; do
     case $((RANDOM % 5)) in
       0) tag="${GREEN}[OK]${RESET}"; msg="cache pédagogique synchronisé";;
-      1) tag="${YELLOW}[WARN]${RESET}"; msg="latence simulée sur relais local";;
+      1) tag="${YELLOW}[WARN]${RESET}"; msg="latence  sur relais local";;
       2) tag="${CYAN}[INFO]${RESET}"; msg="lecture index classes.json";;
       3) tag="${BLUE}[SYNC]${RESET}"; msg="paquet local $(rand_ip)";;
       4) tag="${RED}[DENY]${RESET}"; msg="requête externe bloquée par mode demo";;
@@ -89,10 +89,10 @@ dashboard() {
 
 show_json() {
   header
-  echo -e "${CYAN}[ data/classes.json ]${RESET}"
+  echo -e "${CYAN}[ classes.json ]${RESET}"
   jq . data/classes.json
   echo
-  echo -e "${CYAN}[ data/events.json ]${RESET}"
+  echo -e "${CYAN}[ events.json ]${RESET}"
   jq . data/events.json
   echo
   read -n 1 -s -r -p "Appuie sur une touche pour revenir..."
